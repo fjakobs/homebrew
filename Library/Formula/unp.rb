@@ -10,16 +10,11 @@ class Unp <Formula
  end
 
   def install
-    system "mkdir -p #{prefix}/bin"
-    system "cp unp #{prefix}/bin"
-    system "cp ucat #{prefix}/bin"
-    
-    system "mkdir -p #{prefix}/share/man/man1"
-    system "cp debian/unp.1 #{prefix}/share/man/man1"
-    
-    system "mkdir -p #{prefix}/share/doc/unp"
-    system "cp debian/README.Debian #{prefix}/share/doc/unp"
-    system "cp debian/copyright #{prefix}/share/doc/unp"
-    system "cp debian/changelog #{prefix}/share/doc/unp"
+    bin.install %w[unp ucat]
+    man1.install "debian/unp.1"
+
+    FileUtils.mv 'debian/README.debian', 'README'
+    FileUtils.mv 'debian/copyright', 'COPYING'
+    FileUtils.mv 'debian/changelog', 'ChangeLog'
   end
 end

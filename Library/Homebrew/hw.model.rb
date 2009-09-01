@@ -1,10 +1,32 @@
+#  Copyright 2009 Max Howell and other contributors.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions
+#  are met:
+#
+#  1. Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+#  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+#  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+#  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+#  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+#  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+# The output of the command is in the form of: `MacBook2,1'
+# This yields: "MacBook", 2, 1
 def hw_model_output
-  require 'fileutils'
-  HOMEBREW_CACHE.mkpath
-  exe=HOMEBREW_CACHE+'hw.model'
-  Kernel.system "gcc -Os #{File.dirname __FILE__}/hw.model.c -o #{exe}" unless exe.file?
-  /(.*)(\d+),(\d+)/ =~ `#{exe}`
-  yield $1, $2.to_i, $3.to_i
+  model=`/usr/sbin/sysctl hw.model`.match /hw.model: (\w+)(\d+),(\d+)/
+  yield model[1], model[2].to_i, model[3].to_i
 end
 
 # http://support.apple.com/kb/HT3696
@@ -12,11 +34,11 @@ end
 def hw_model
   hw_model_output do |model, major, minor|
     case model
-      when "iMac" 
-        if major <=4
+      when "iMac"
+        if major <= 4
           :core1
         else
-          $unknown_hw_model=true if major >8
+          $unknown_hw_model=true if major > 8
           :core2
         end
 
