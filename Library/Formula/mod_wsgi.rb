@@ -1,4 +1,4 @@
-require 'brewkit'
+require 'formula'
 
 class ModWsgi <Formula
   @url='http://modwsgi.googlecode.com/files/mod_wsgi-2.5.tar.gz'
@@ -12,16 +12,18 @@ class ModWsgi <Formula
   end
 
   def install
-    FileUtils.mv 'LICENCE', 'LICENSE'
-    system "./configure --prefix='#{prefix}' --disable-debug --disable-dependency-tracking"
+    system "./configure", "--prefix=#{prefix}", "--disable-debug", "--disable-dependency-tracking"
 
-    # Just build 32-bit Intel
-    # The arch flags should match your Python's arch flags.
-    inreplace 'Makefile', "-Wc,'-arch ppc7400' -Wc,'-arch ppc64' -Wc,'-arch i386' -Wc,'-arch x86_64'", "-Wc,'-arch i386'"
-    inreplace 'Makefile', "-arch ppc7400 -arch ppc64 -arch i386 -arch x86_64", "-arch i386"
+    archs = archs_for_command("python").collect{ |arch| "-arch #{arch}" }
     
-    # --libexecdir parameter to ./configure isn't changing this, so cram it in
-    inreplace 'Makefile', "LIBEXECDIR = /usr/libexec/apache2", "LIBEXECDIR = #{libexec}"
+    inreplace 'Makefile' do |s|
+      s.gsub! "-Wc,'-arch ppc7400' -Wc,'-arch ppc64' -Wc,'-arch i386' -Wc,'-arch x86_64'",
+              archs.collect{ |a| "-Wc,'#{a}'" }.join(' ')
+      s.gsub! "-arch ppc7400 -arch ppc64 -arch i386 -arch x86_64",
+              archs*' '
+      # --libexecdir parameter to ./configure isn't changing this, so cram it in
+      s.change_make_var! "LIBEXECDIR", libexec
+    end
 
     system "make install"
   end

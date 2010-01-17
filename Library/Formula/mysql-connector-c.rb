@@ -1,16 +1,17 @@
-require 'brewkit'
+require 'formula'
 
 class MysqlConnectorC <Formula
   @homepage='http://dev.mysql.com/downloads/connector/c/6.0.html'
-  @url='http://mysql.llarian.net/Downloads/Connector-C/mysql-connector-c-6.0.1.tar.gz'
-  @md5='348a869fa72957062ea4e7ad3865623c'
+  @url='http://mysql.llarian.net/Downloads/Connector-C/mysql-connector-c-6.0.2.tar.gz'
+  @md5='f922b778abdd25f7c1c95a8329144d56'
 
-  def deps
-    BinaryDep.new 'cmake'
-  end
+  depends_on 'cmake'
 
   def install
+    ENV.gcc_4_2 # error: unsupported inline asm
     system "cmake . #{std_cmake_parameters}"
+    system 'make'
+    ENV.j1
     system 'make install'
   end
 end
