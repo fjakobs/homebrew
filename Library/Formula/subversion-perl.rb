@@ -13,8 +13,9 @@ class SubversionPerl <Subversion
   end
   
   def install
-    setup_leopard if MACOS_VERSION < 10.6    
-    ENV["CFLAGS"] = nil
+    setup_leopard if MACOS_VERSION < 10.6
+    ENV.minimal_optimization
+    #ENV["CFLAGS"] = nil
     
     # Use existing system zlib
     # Use dep-provided other libraries

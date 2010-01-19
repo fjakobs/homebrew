@@ -10,8 +10,13 @@ class Git <Formula
   md5 '25e4bcdc528b3ffadc6e59908a513881'
   homepage 'http://git-scm.com'
   
-  # required to build git-svn
-  depends_on "subversion-perl" => :optional
+  def options
+    [
+      ['--with-svn', "Enable git-svn support"]
+    ]
+  end
+  
+  depends_on "subversion-perl" if ARGV.include? '--with-svn'
 
   def install
     # if these things are installed, tell git build system to not use them
